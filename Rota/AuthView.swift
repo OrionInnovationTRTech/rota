@@ -9,27 +9,15 @@ import SwiftUI
 import FirebaseCore
 import FirebaseAuth
 import FirebaseStorage
-
-class FirebaseManager: NSObject {
-    let auth: Auth
-    let storage: Storage
-    
-    static let shared = FirebaseManager()
-    override init() {
-        FirebaseApp.configure()
-        self.auth = Auth.auth()
-        self.storage = Storage.storage()
-        super.init()
-    }
-}
+import FirebaseFirestore
 
 struct AuthView: View {
+    let didCompleteLoginProcess: () -> ()
     
-    @State var isLoginMode = false
-    @State var email = ""
-    @State var password = ""
-    
-    @State var shouldShowImagePicker = false
+    @State private var isLoginMode = false
+    @State private var email = ""
+    @State private var password = ""
+    @State private var shouldShowImagePicker = false
     
     var body: some View {
         NavigationView {
@@ -129,10 +117,17 @@ struct AuthView: View {
             
             print("Successfully logged in user: \(result?.user.uid ?? "")")
             self.authStatusMessage = "Successfully logged in user: \(result?.user.uid ?? "")"
+            
+            self.didCompleteLoginProcess()
         }
     }
     
     private func createNewAccount() {
+        if self.image == nil {
+            self.authStatusMessage = "You must select an image"
+            return
+        }
+        
         FirebaseManager.shared.auth.createUser(withEmail: email, password: password) { result, error in
             if let err = error {
                 print("Failed to create user: \(err)")
@@ -164,14 +159,33 @@ struct AuthView: View {
                 }
                 
                 self.authStatusMessage = "Successfully stored image with URL: \(url?.absoluteString ?? "")"
-                print(url?.absoluteString)
+                //print(url?.absoluteString)
+                
+                guard let url = url else { return }
+                self.storeUserInformation(imageProfileURL: url)
             }
+        }
+    }
+    private func storeUserInformation(imageProfileURL: URL) {
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
+        let userData = ["email": self.email, "uid": uid, "profileImageURL": imageProfileURL.absoluteString]
+        FirebaseManager.shared.firestore.collection("users").document(uid).setData(userData) { err in
+            if let err = err {
+                print(err)
+                self.authStatusMessage = "\(err)"
+                return
+            }
+            
+            self.authStatusMessage = "Successfully stored user data"
+            print("Success")
+            
+            self.didCompleteLoginProcess()
         }
     }
 }
 
 struct AuthView_Previews: PreviewProvider {
     static var previews: some View {
-        AuthView()
+        AuthView(didCompleteLoginProcess: {})
     }
 }

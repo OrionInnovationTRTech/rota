@@ -8,5 +8,7 @@ target 'Rota' do
   # Pods for Rota
   pod 'FirebaseAuth'
   pod 'FirebaseStorage'
+  pod 'FirebaseFirestore'
+  pod 'SDWebImageSwiftUI'
 
 end

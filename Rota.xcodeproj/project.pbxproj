@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		2431C555287EF08800D5AE3F /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2431C554287EF08800D5AE3F /* ImagePicker.swift */; };
+		244CAD93288184A7009B10E0 /* MainMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244CAD92288184A7009B10E0 /* MainMessagesView.swift */; };
+		244CAD962881A19C009B10E0 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244CAD952881A19C009B10E0 /* FirebaseManager.swift */; };
+		2488DA442881F30900719F44 /* MessagesViewUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2488DA432881F30900719F44 /* MessagesViewUser.swift */; };
 		2490BA53287EA72900864A7F /* RotaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2490BA52287EA72900864A7F /* RotaApp.swift */; };
 		2490BA57287EA72A00864A7F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2490BA56287EA72A00864A7F /* Assets.xcassets */; };
 		2490BA5A287EA72A00864A7F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2490BA59287EA72A00864A7F /* Preview Assets.xcassets */; };
@@ -20,6 +23,9 @@
 /* Begin PBXFileReference section */
 		20AD57D956AE5236C859EC2E /* Pods-Rota.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rota.debug.xcconfig"; path = "Target Support Files/Pods-Rota/Pods-Rota.debug.xcconfig"; sourceTree = "<group>"; };
 		2431C554287EF08800D5AE3F /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		244CAD92288184A7009B10E0 /* MainMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMessagesView.swift; sourceTree = "<group>"; };
+		244CAD952881A19C009B10E0 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
+		2488DA432881F30900719F44 /* MessagesViewUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewUser.swift; sourceTree = "<group>"; };
 		2490BA4F287EA72900864A7F /* Rota.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rota.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2490BA52287EA72900864A7F /* RotaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotaApp.swift; sourceTree = "<group>"; };
 		2490BA56287EA72A00864A7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -43,6 +49,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		244CAD9128818470009B10E0 /* MainMessages */ = {
+			isa = PBXGroup;
+			children = (
+				244CAD92288184A7009B10E0 /* MainMessagesView.swift */,
+			);
+			path = MainMessages;
+			sourceTree = "<group>";
+		};
+		244CAD942881A179009B10E0 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				244CAD952881A19C009B10E0 /* FirebaseManager.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		2488DA422881F2B400719F44 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				2488DA432881F30900719F44 /* MessagesViewUser.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		2490BA46287EA72900864A7F = {
 			isa = PBXGroup;
 			children = (
@@ -64,6 +94,9 @@
 		2490BA51287EA72900864A7F /* Rota */ = {
 			isa = PBXGroup;
 			children = (
+				2488DA422881F2B400719F44 /* Model */,
+				244CAD942881A179009B10E0 /* Utils */,
+				244CAD9128818470009B10E0 /* MainMessages */,
 				2490BA52287EA72900864A7F /* RotaApp.swift */,
 				2490BA60287EA73C00864A7F /* AuthView.swift */,
 				24E4A6BE287EDC1600EA81F7 /* GoogleService-Info.plist */,
@@ -215,10 +248,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				244CAD962881A19C009B10E0 /* FirebaseManager.swift in Sources */,
 				2490BA61287EA73C00864A7F /* AuthView.swift in Sources */,
 				2431C555287EF08800D5AE3F /* ImagePicker.swift in Sources */,
+				2488DA442881F30900719F44 /* MessagesViewUser.swift in Sources */,
 				2490BA63287EAFD500864A7F /* ColorExt.swift in Sources */,
 				2490BA53287EA72900864A7F /* RotaApp.swift in Sources */,
+				244CAD93288184A7009B10E0 /* MainMessagesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
