@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		241304622886A92500D126BE /* CreateMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241304612886A92500D126BE /* CreateMessageView.swift */; };
 		2431C555287EF08800D5AE3F /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2431C554287EF08800D5AE3F /* ImagePicker.swift */; };
+		2434DC832887DEB60073E114 /* ChatLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2434DC822887DEB60073E114 /* ChatLogView.swift */; };
 		244CAD93288184A7009B10E0 /* MainMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244CAD92288184A7009B10E0 /* MainMessagesView.swift */; };
 		244CAD962881A19C009B10E0 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244CAD952881A19C009B10E0 /* FirebaseManager.swift */; };
 		2488DA442881F30900719F44 /* MessagesViewUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2488DA432881F30900719F44 /* MessagesViewUser.swift */; };
@@ -22,7 +24,9 @@
 
 /* Begin PBXFileReference section */
 		20AD57D956AE5236C859EC2E /* Pods-Rota.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rota.debug.xcconfig"; path = "Target Support Files/Pods-Rota/Pods-Rota.debug.xcconfig"; sourceTree = "<group>"; };
+		241304612886A92500D126BE /* CreateMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateMessageView.swift; sourceTree = "<group>"; };
 		2431C554287EF08800D5AE3F /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		2434DC822887DEB60073E114 /* ChatLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogView.swift; sourceTree = "<group>"; };
 		244CAD92288184A7009B10E0 /* MainMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMessagesView.swift; sourceTree = "<group>"; };
 		244CAD952881A19C009B10E0 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
 		2488DA432881F30900719F44 /* MessagesViewUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewUser.swift; sourceTree = "<group>"; };
@@ -49,9 +53,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		241304602886A8DB00D126BE /* NewMessage */ = {
+			isa = PBXGroup;
+			children = (
+				241304612886A92500D126BE /* CreateMessageView.swift */,
+			);
+			path = NewMessage;
+			sourceTree = "<group>";
+		};
+		2434DC812887DEA50073E114 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				2434DC822887DEB60073E114 /* ChatLogView.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
 		244CAD9128818470009B10E0 /* MainMessages */ = {
 			isa = PBXGroup;
 			children = (
+				2434DC812887DEA50073E114 /* Chat */,
+				241304602886A8DB00D126BE /* NewMessage */,
 				244CAD92288184A7009B10E0 /* MainMessagesView.swift */,
 			);
 			path = MainMessages;
@@ -250,10 +272,12 @@
 			files = (
 				244CAD962881A19C009B10E0 /* FirebaseManager.swift in Sources */,
 				2490BA61287EA73C00864A7F /* AuthView.swift in Sources */,
+				2434DC832887DEB60073E114 /* ChatLogView.swift in Sources */,
 				2431C555287EF08800D5AE3F /* ImagePicker.swift in Sources */,
 				2488DA442881F30900719F44 /* MessagesViewUser.swift in Sources */,
 				2490BA63287EAFD500864A7F /* ColorExt.swift in Sources */,
 				2490BA53287EA72900864A7F /* RotaApp.swift in Sources */,
+				241304622886A92500D126BE /* CreateMessageView.swift in Sources */,
 				244CAD93288184A7009B10E0 /* MainMessagesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

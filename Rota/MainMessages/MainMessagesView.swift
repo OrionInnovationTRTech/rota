@@ -47,6 +47,7 @@ class MainMessagesViewModel: ObservableObject {
 struct MainMessagesView: View {
     
     @State var shouldShowLogOutOptions = false
+    @State var shouldNavigateToChatLogView = false
     @ObservedObject private var messagesViewModel = MainMessagesViewModel()
     
     var body: some View {
@@ -54,11 +55,16 @@ struct MainMessagesView: View {
             VStack {
                 customNavBar
                 messagesView
-                .overlay(
-                    newMessageButton, alignment: .bottom
-                )
-                .navigationBarHidden(true)
+                
+                NavigationLink("", isActive: $shouldNavigateToChatLogView) {
+                    ChatLogView(messagesViewUser: messageViewUser)
+                }
             }
+            .overlay(
+                newMessageButton.padding(.bottom, 11), alignment: .bottom
+            )
+            .ignoresSafeArea(edges: .bottom)
+            .navigationBarHidden(true)
         }
     }
     
@@ -103,24 +109,28 @@ struct MainMessagesView: View {
         ScrollView {
             ForEach(0..<10, id: \.self) { num in
                 VStack {
-                    HStack(spacing: 16) {
-                        Image(systemName: "person.fill")
-                            .font(.system(size: 32))
-                            .padding(8)
-                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.label), lineWidth: 1.5))
-                        VStack(alignment: .leading) {
-                            Text("Username")
-                                .font(.system(size: 17, weight: .bold))
-                            Text("Message sent to user")
-                                .font(.system(size: 15))
-                                .foregroundColor(Color(.lightGray))
-                            
+                    NavigationLink {
+                        ChatLogView(messagesViewUser: messageViewUser)
+                    } label: {
+                        HStack(spacing: 16) {
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 32))
+                                .padding(8)
+                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.label), lineWidth: 1.5))
+                            VStack(alignment: .leading) {
+                                Text("Username")
+                                    .font(.system(size: 17, weight: .bold))
+                                Text("Message sent to user")
+                                    .font(.system(size: 15))
+                                    .foregroundColor(Color(.lightGray))
+                                
+                            }
+                            Spacer()
+                            Text("22d")
+                                .font(.system(size: 14, weight: .semibold))
                         }
-                        Spacer()
-                        Text("22d")
-                            .font(.system(size: 14, weight: .semibold))
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                     Divider()
                         .padding(.vertical, 7)
                 }
@@ -130,9 +140,12 @@ struct MainMessagesView: View {
         }
     }
     
+    @State var shouldShowCreateMessageScreen = false
+    @State var messageViewUser: MessagesViewUser?
+    
     private var newMessageButton: some View {
         Button(action: {
-            
+            shouldShowCreateMessageScreen.toggle()
         }, label: {
             VStack{
                 HStack {
@@ -150,6 +163,13 @@ struct MainMessagesView: View {
             .cornerRadius(10)
             .padding(.horizontal)
         })
+        .padding(.bottom)
+        .fullScreenCover(isPresented: $shouldShowCreateMessageScreen) {
+            CreateMessageView(didSelectUser: {user in
+                self.shouldNavigateToChatLogView.toggle()
+                self.messageViewUser = user
+            })
+        }
     }
 }
 

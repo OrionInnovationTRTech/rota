@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct MessagesViewUser {
+struct MessagesViewUser: Identifiable {
+    var id: String {uid}
+    
     let uid, email, profileImageURL: String
     
     init(data: [String: Any]) {

@@ -11,7 +11,7 @@ import SwiftUI
 struct RotaApp: App {
     var body: some Scene {
         WindowGroup {
-            AuthView(didCompleteLoginProcess: {})
+            MainMessagesView()
         }
     }
 }
