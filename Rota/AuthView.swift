@@ -24,15 +24,6 @@ struct AuthView: View {
             ScrollView {
                 
                 VStack(spacing: 16) {
-                    Picker(selection: $isLoginMode, label: Text("Picker")) {
-                        Text("Log In")
-                            .tag(true)
-                        Text("Create Account")
-                            .tag(false)
-                    }
-                    .pickerStyle(.segmented)
-                    .padding()
-                    
                     if !isLoginMode {
                         Button {
                             shouldShowImagePicker.toggle()
@@ -78,6 +69,20 @@ struct AuthView: View {
                         }
                         .background(.blue)
                     }
+                    
+                    HStack {
+                        Text(isLoginMode ? "Don't have an account?" : "Have an account?")
+                        Button {
+                            isLoginMode.toggle()
+                        } label: {
+                            HStack {
+                                Text(isLoginMode ? "Create Account" : "Log In")
+                                    .foregroundColor(.blue)
+                            }
+                        }
+
+                    }
+
                     
                     Text(self.authStatusMessage)
                         .foregroundColor(.red)

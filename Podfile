@@ -10,5 +10,5 @@ target 'Rota' do
   pod 'FirebaseStorage'
   pod 'FirebaseFirestore'
   pod 'SDWebImageSwiftUI'
-
+  pod 'FirebaseFirestoreSwift'
 end

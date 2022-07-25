@@ -10,34 +10,53 @@ import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
 
-struct FirebaseConstants {
-    static let fromId = "fromId"
-    static let toId = "toId"
-    static let text = "text"
-    let messagePadding = 10
-}
-
-struct ChatMessage: Identifiable {
-    var id: String { documentId }
-    var documentId: String
-    var fromId, toId, text: String
-    init(documentId: String, data: [String: Any]) {
-        self.documentId = documentId
-        self.fromId = data[FirebaseConstants.fromId] as? String ?? ""
-        self.toId = data[FirebaseConstants.toId] as? String ?? ""
-        self.text = data[FirebaseConstants.text] as? String ?? ""
-    }
-}
-
 class ChatLogViewModel: ObservableObject {
+    @Published var count = 0
     @Published var messageText = ""
     @Published var errorMessage = ""
     @Published var chatMessages = [ChatMessage]()
-    let messagesViewUser: MessagesViewUser?
+    
+    var messagesViewUser: MessagesViewUser?
+    
+    @Published var currentUser: MessagesViewUser?
+    
     init(messagesViewUser: MessagesViewUser?) {
         self.messagesViewUser = messagesViewUser
         fetchMessages()
     }
+    
+    var firestoreListener: ListenerRegistration?
+    
+    func fetchMessages() {
+        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else {return}
+        guard let toId = messagesViewUser?.uid else {return}
+        firestoreListener?.remove()
+        chatMessages.removeAll()
+        firestoreListener = FirebaseManager.shared.firestore.collection("messages")
+            .document(fromId)
+            .collection(toId)
+            .order(by: FirebaseConstants.timestamp)
+            .addSnapshotListener { querySnapshot, error in
+                if let error = error {
+                    self.errorMessage = "Failed to listen for messages: \(error)"
+                    print(error)
+                    return
+                }
+                querySnapshot?.documentChanges.forEach({ change in
+                    if change.type == .added {
+                        if let msg = try? change.document.data(as: ChatMessage.self) {
+                            self.chatMessages.append(msg)
+                            print("Appending chatMessage")
+                        }
+                    }
+                })
+                DispatchQueue.main.async {
+                    self.count += 1
+                }
+                
+            }
+    }
+    
     func handleSend() {
         print(messageText)
         guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else {return}
@@ -48,7 +67,7 @@ class ChatLogViewModel: ObservableObject {
             .collection(toId)
             .document()
         
-        let messageData = [FirebaseConstants.fromId: fromId, FirebaseConstants.toId: toId, FirebaseConstants.text: self.messageText, "timestamp": Timestamp()] as [String: Any]
+        let messageData = [FirebaseConstants.fromId: fromId, FirebaseConstants.toId: toId, FirebaseConstants.text: self.messageText, FirebaseConstants.timestamp: Timestamp()] as [String: Any]
         
         document.setData(messageData) { error in
             if let error = error {
@@ -57,7 +76,6 @@ class ChatLogViewModel: ObservableObject {
             }
         }
         print("Successfully saved sending message on current user")
-        messageText = ""
         
         let recipientMessageDocument = FirebaseManager.shared.firestore.collection("messages")
             .document(toId)
@@ -71,83 +89,134 @@ class ChatLogViewModel: ObservableObject {
             }
             print("Recipient saved message as well")
         }
+        
+        fetchCurrentUser()
     }
     
-    private func fetchMessages() {
-        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else {return}
-        guard let toId = messagesViewUser?.uid else {return}
-        FirebaseManager.shared.firestore.collection("messages")
-            .document(fromId)
-            .collection(toId)
-            .order(by: "timestamp")
-            .addSnapshotListener { querySnapshot, error in
-                if let error = error {
-                    self.errorMessage = "Failed to listen for messages: \(error)"
-                    print(error)
-                    return
-                }
-                querySnapshot?.documentChanges.forEach({ change in
-                    if change.type == .added {
-                        let data = change.document.data()
-                        self.chatMessages.append(.init(documentId: change.document.documentID, data: data))
-                    }
-                })
+    func fetchCurrentUser() {
+        
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
+        self.errorMessage = "\(uid)"
+        FirebaseManager.shared.firestore.collection("users").document(uid).getDocument { snapshot, error in
+            if let err = error {
+                self.errorMessage = "Failed to fetch current user: \(err.localizedDescription)"
+                print("Failed to fetch current user: \(err.localizedDescription)")
+                return
             }
+            
+            guard let data = snapshot?.data() else {
+                self.errorMessage = "No data found"
+                return
+            }
+            
+            self.currentUser = .init(data: data)
+            self.persistRecentMessage()
+            self.messageText = ""
+        }
+    }
+    
+    private func persistRecentMessage() {
+        guard let messagesViewUser = messagesViewUser else {
+            return
+        }
+        
+        guard let currentUser = currentUser else {
+            print("Error on current user")
+            return
+        }
+        
+        let uid = currentUser.uid
+        
+        let toId = messagesViewUser.uid
+        
+        let document = FirebaseManager.shared.firestore
+            .collection("recent_messages")
+            .document(uid)
+            .collection("messages")
+            .document(toId)
+        
+        let data = [
+            FirebaseConstants.timestamp: Timestamp(),
+            FirebaseConstants.fromId: uid,
+            FirebaseConstants.toId: toId,
+            FirebaseConstants.text: messageText,
+            FirebaseConstants.profileImageURL: messagesViewUser.profileImageURL,
+            FirebaseConstants.email: messagesViewUser.email
+        ] as [String : Any]
+        
+        document.setData(data) { error in
+            if let error = error {
+                self.errorMessage = "Failed to save recent message: \(error)"
+                print("Failed to save recent message: \(error)")
+                return
+            }
+        }
+        
+        print("Successfully saved recent message on current user")
+        
+        let recipientDocument = FirebaseManager.shared.firestore
+            .collection("recent_messages")
+            .document(toId)
+            .collection("messages")
+            .document(uid)
+        
+        let recipientData = [
+            FirebaseConstants.timestamp: Timestamp(),
+            FirebaseConstants.fromId: uid,
+            FirebaseConstants.toId: toId,
+            FirebaseConstants.text: messageText,
+            FirebaseConstants.profileImageURL: currentUser.profileImageURL,
+            FirebaseConstants.email: currentUser.email
+        ] as [String : Any]
+        
+        recipientDocument.setData(recipientData) { error in
+            if let error = error {
+                self.errorMessage = "Failed to save recent message: \(error)"
+                print("Failed to save recent message: \(error)")
+                return
+            }
+        }
+        
+        print("Successfully saved recent message on recipient user")
     }
 }
 
 struct ChatLogView: View {
-    let messagesViewUser: MessagesViewUser?
-    init(messagesViewUser: MessagesViewUser?) {
-        self.messagesViewUser = messagesViewUser
-        self.chatLogViewModel = .init(messagesViewUser: messagesViewUser)
-    }
+//    let messagesViewUser: MessagesViewUser?
+//    init(messagesViewUser: MessagesViewUser?) {
+//        self.messagesViewUser = messagesViewUser
+//        self.chatLogViewModel = .init(messagesViewUser: messagesViewUser)
+//    }
     @ObservedObject var chatLogViewModel: ChatLogViewModel
     var body: some View {
         ZStack{
             messagesDisplay
             Text(chatLogViewModel.errorMessage)
         }
-        .navigationTitle(messagesViewUser?.email ?? "")
+        .navigationTitle(chatLogViewModel.messagesViewUser?.email ?? "")
         .navigationBarTitleDisplayMode(.inline)
+        .onDisappear {
+            self.chatLogViewModel.firestoreListener?.remove()
+        }
     }
     private var messagesDisplay: some View {
         VStack {
             ScrollView {
-                ForEach(chatLogViewModel.chatMessages) { message in
+                ScrollViewReader { scrollViewProxy in
                     VStack {
-                        if message.fromId == FirebaseManager.shared.auth.currentUser?.uid {
-                            HStack{
-                                Spacer()
-                                HStack {
-                                    Text(message.text)
-                                        .foregroundColor(.white)
-                                }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 12)
-                                .background(Color.blue)
-                                .cornerRadius(8)
-                            }
-                        } else {
-                            HStack{
-                                HStack {
-                                    Text(message.text)
-                                        .foregroundColor(.black)
-                                }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 12)
-                                .background(.white)
-                                .cornerRadius(8)
-                                Spacer()
-                            }
-                            .padding(.horizontal)
-                            .padding(.top, 4)
+                        ForEach(chatLogViewModel.chatMessages) { message in
+                            MessageView(message: message)
+                        }
+                        HStack { Spacer() }
+                            .id("Empty")
+                    }
+                    .onReceive(chatLogViewModel.$count) { _ in
+                        withAnimation(.easeOut(duration: 0.5)) {
+                            scrollViewProxy.scrollTo("Empty", anchor: .bottom)
                         }
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 4)
-                    
                 }
+                
             }
             .background(Color(.init(white: 0.95, alpha: 1)))
             .safeAreaInset(edge: .bottom) {
@@ -157,6 +226,7 @@ struct ChatLogView: View {
         }
         
     }
+    
     private var chatBottomBar: some View {
         HStack {
             Image(systemName: "plus.square")
@@ -183,6 +253,43 @@ struct ChatLogView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
+    }
+}
+
+struct MessageView: View {
+    let message: ChatMessage
+    var body: some View {
+        VStack {
+            if message.fromId == FirebaseManager.shared.auth.currentUser?.uid {
+                HStack{
+                    Spacer()
+                    HStack {
+                        Text(message.text)
+                            .foregroundColor(.white)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 12)
+                    .background(Color.blue)
+                    .cornerRadius(8)
+                }
+            } else {
+                HStack{
+                    HStack {
+                        Text(message.text)
+                            .foregroundColor(.black)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 12)
+                    .background(.white)
+                    .cornerRadius(8)
+                    Spacer()
+                }
+                .padding(.horizontal)
+                .padding(.top, 4)
+            }
+        }
+        .padding(.horizontal)
+        .padding(.top, 4)
     }
 }
 
