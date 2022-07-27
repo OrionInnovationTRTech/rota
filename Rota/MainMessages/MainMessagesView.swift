@@ -107,6 +107,7 @@ struct MainMessagesView: View {
             )
             .ignoresSafeArea(edges: .bottom)
             .navigationBarHidden(true)
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
     
@@ -213,7 +214,6 @@ struct MainMessagesView: View {
             .cornerRadius(10)
             .padding(.horizontal)
         })
-        .padding(.bottom)
         .fullScreenCover(isPresented: $shouldShowCreateMessageScreen) {
             CreateMessageView(didSelectUser: {user in
                 self.shouldNavigateToChatLogView.toggle()

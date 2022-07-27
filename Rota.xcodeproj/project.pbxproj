@@ -21,6 +21,10 @@
 		2490BA5A287EA72A00864A7F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2490BA59287EA72A00864A7F /* Preview Assets.xcassets */; };
 		2490BA61287EA73C00864A7F /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2490BA60287EA73C00864A7F /* AuthView.swift */; };
 		2490BA63287EAFD500864A7F /* ColorExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2490BA62287EAFD500864A7F /* ColorExt.swift */; };
+		2498EC01288ECCC200D4F24F /* AppTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2498EC00288ECCC200D4F24F /* AppTabView.swift */; };
+		2498EC03288ED2B800D4F24F /* SearchTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2498EC02288ED2B800D4F24F /* SearchTripView.swift */; };
+		24B2413528918F730046D1A5 /* SearchLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B2413428918F730046D1A5 /* SearchLocationView.swift */; };
+		24B2413728918F990046D1A5 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B2413628918F990046D1A5 /* LocationManager.swift */; };
 		24E4A6BF287EDC1600EA81F7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 24E4A6BE287EDC1600EA81F7 /* GoogleService-Info.plist */; };
 		CB334382C015CF294550C34B /* Pods_Rota.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B57C46AB6ED0EA18938DAEB /* Pods_Rota.framework */; };
 /* End PBXBuildFile section */
@@ -42,6 +46,10 @@
 		2490BA59287EA72A00864A7F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2490BA60287EA73C00864A7F /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		2490BA62287EAFD500864A7F /* ColorExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExt.swift; sourceTree = "<group>"; };
+		2498EC00288ECCC200D4F24F /* AppTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTabView.swift; sourceTree = "<group>"; };
+		2498EC02288ED2B800D4F24F /* SearchTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTripView.swift; sourceTree = "<group>"; };
+		24B2413428918F730046D1A5 /* SearchLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationView.swift; sourceTree = "<group>"; };
+		24B2413628918F990046D1A5 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		24E4A6BE287EDC1600EA81F7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8B57C46AB6ED0EA18938DAEB /* Pods_Rota.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Rota.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9F6C3169EFC0AB37F1B3FAE /* Pods-Rota.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rota.release.xcconfig"; path = "Target Support Files/Pods-Rota/Pods-Rota.release.xcconfig"; sourceTree = "<group>"; };
@@ -128,8 +136,11 @@
 				2488DA422881F2B400719F44 /* Model */,
 				244CAD942881A179009B10E0 /* Utils */,
 				244CAD9128818470009B10E0 /* MainMessages */,
-				2490BA52287EA72900864A7F /* RotaApp.swift */,
+				24B2413228918ED00046D1A5 /* SearchTrip */,
+				24B2413328918F180046D1A5 /* ViewModel */,
 				2490BA60287EA73C00864A7F /* AuthView.swift */,
+				2498EC00288ECCC200D4F24F /* AppTabView.swift */,
+				2490BA52287EA72900864A7F /* RotaApp.swift */,
 				24E4A6BE287EDC1600EA81F7 /* GoogleService-Info.plist */,
 				2490BA56287EA72A00864A7F /* Assets.xcassets */,
 				2490BA58287EA72A00864A7F /* Preview Content */,
@@ -145,6 +156,23 @@
 				2490BA59287EA72A00864A7F /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		24B2413228918ED00046D1A5 /* SearchTrip */ = {
+			isa = PBXGroup;
+			children = (
+				2498EC02288ED2B800D4F24F /* SearchTripView.swift */,
+				24B2413428918F730046D1A5 /* SearchLocationView.swift */,
+				24B2413628918F990046D1A5 /* LocationManager.swift */,
+			);
+			path = SearchTrip;
+			sourceTree = "<group>";
+		};
+		24B2413328918F180046D1A5 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		341C56FE7413400BD6BF205D /* Pods */ = {
@@ -280,8 +308,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				244CAD962881A19C009B10E0 /* FirebaseManager.swift in Sources */,
+				24B2413528918F730046D1A5 /* SearchLocationView.swift in Sources */,
 				2490BA61287EA73C00864A7F /* AuthView.swift in Sources */,
 				24862823288B22800024A7C3 /* RecentMessage.swift in Sources */,
+				24B2413728918F990046D1A5 /* LocationManager.swift in Sources */,
+				2498EC03288ED2B800D4F24F /* SearchTripView.swift in Sources */,
 				2434DC832887DEB60073E114 /* ChatLogView.swift in Sources */,
 				2431C555287EF08800D5AE3F /* ImagePicker.swift in Sources */,
 				24862825288B22DA0024A7C3 /* ChatMessage.swift in Sources */,
@@ -290,6 +321,7 @@
 				24862827288B3AA60024A7C3 /* FirebaseConstants.swift in Sources */,
 				2490BA53287EA72900864A7F /* RotaApp.swift in Sources */,
 				241304622886A92500D126BE /* CreateMessageView.swift in Sources */,
+				2498EC01288ECCC200D4F24F /* AppTabView.swift in Sources */,
 				244CAD93288184A7009B10E0 /* MainMessagesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -423,6 +455,7 @@
 				DEVELOPMENT_TEAM = PRN8U785S7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -453,6 +486,7 @@
 				DEVELOPMENT_TEAM = PRN8U785S7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

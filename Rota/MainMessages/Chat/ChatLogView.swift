@@ -189,10 +189,7 @@ struct ChatLogView: View {
 //    }
     @ObservedObject var chatLogViewModel: ChatLogViewModel
     var body: some View {
-        ZStack{
-            messagesDisplay
-            Text(chatLogViewModel.errorMessage)
-        }
+        messagesDisplay
         .navigationTitle(chatLogViewModel.messagesViewUser?.email ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear {

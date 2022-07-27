@@ -11,7 +11,10 @@ import SwiftUI
 struct RotaApp: App {
     var body: some Scene {
         WindowGroup {
-            MainMessagesView()
+            NavigationView {
+                AppTabView()
+            }
+            .navigationBarHidden(true)
         }
     }
 }
