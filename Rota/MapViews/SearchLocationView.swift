@@ -9,7 +9,8 @@ import SwiftUI
 import MapKit
 
 struct SearchLocationView: View {
-    @StateObject var locationManager: LocationManager = .init()
+    @Environment(\.presentationMode) var presentationMode
+    @StateObject var locationManager: LocationManager
     @State var navigationTag: String?
     var body: some View {
         VStack {
@@ -39,7 +40,7 @@ struct SearchLocationView: View {
                                 locationManager.pickedLocation = .init(latitude: coordinate.latitude, longitude: coordinate.longitude)
                                 locationManager.mapView.region = .init(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
                                 locationManager.addDraggablePin(coordinate: coordinate)
-                                locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude))
+                                locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate)
                             }
                             navigationTag = "MAPVIEW"
                         } label: {
@@ -65,7 +66,7 @@ struct SearchLocationView: View {
                     if let coordinate = locationManager.userLocation?.coordinate{
                         locationManager.mapView.region = .init(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
                         locationManager.addDraggablePin(coordinate: coordinate)
-                        locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude))
+                        locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate)
                         
                         navigationTag = "MAPVIEW"
                     }
@@ -86,8 +87,9 @@ struct SearchLocationView: View {
         .frame(maxHeight: .infinity, alignment: .top)
         .background {
             NavigationLink(tag: "MAPVIEW", selection: $navigationTag) {
-                MapViewSelection()
+                MapViewSelection(superPresentationMode: presentationMode)
                     .environmentObject(locationManager)
+                    .navigationBarHidden(true)
             } label: {}
                 .labelsHidden()
 
@@ -97,12 +99,14 @@ struct SearchLocationView: View {
 
 struct SearchLocationView_Previews: PreviewProvider {
     static var previews: some View {
-        SearchLocationView()
+        SearchLocationView(locationManager: .init())
             .preferredColorScheme(.light)
     }
 }
 
 struct MapViewSelection: View {
+    @Binding var superPresentationMode: PresentationMode
+    @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var locationManager: LocationManager
     @State var navigationTag: String?
     var body: some View {
@@ -110,22 +114,18 @@ struct MapViewSelection: View {
             MapViewHelper()
                 .environmentObject(locationManager)
                 .ignoresSafeArea()
-
+            
             if let place = locationManager.pickedPlacemark {
                 
                 VStack(spacing: 0) {
-            
                     VStack {
                         Button {
-                            locationManager.pickedPlacemark = nil
-                            locationManager.pickedLocation = nil
-                            
                             locationManager.mapView.removeAnnotations(locationManager.mapView.annotations)
                             
                             if let coordinate = locationManager.userLocation?.coordinate{
                                 locationManager.mapView.region = .init(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
                                 locationManager.addDraggablePin(coordinate: coordinate)
-                                locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude))
+                                locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate)
                                 
                                 navigationTag = "MAPVIEW"
                             }
@@ -162,7 +162,9 @@ struct MapViewSelection: View {
                         .padding(.vertical, 10)
                         
                         Button  {
-                            
+                            locationManager.searchText = ""
+                            self.$superPresentationMode.wrappedValue.dismiss()
+                            self.presentationMode.wrappedValue.dismiss()
                         } label: {
                             Text("Confirm Location")
                                 .fontWeight(.semibold)
@@ -171,11 +173,6 @@ struct MapViewSelection: View {
                                 .background {
                                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                                         .fill(.blue)
-                                }
-                                .overlay(alignment: .trailing) {
-                                    Image(systemName: "arrow.right")
-                                        .font(.title3.bold())
-                                        .padding(.trailing)
                                 }
                                 .foregroundColor(.white)
                         }
@@ -191,10 +188,7 @@ struct MapViewSelection: View {
                 .frame(maxHeight: .infinity, alignment: .bottom)
             }
         }
-        .onDisappear {
-            locationManager.pickedPlacemark = nil
-            locationManager.pickedLocation = nil
-            
+        .onDisappear() {
             locationManager.mapView.removeAnnotations(locationManager.mapView.annotations)
         }
     }

@@ -20,8 +20,12 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
     
     @Published var userLocation: CLLocation?
     
-    @Published var pickedLocation: CLLocation?
+    @Published var pickedLocation: CLLocationCoordinate2D?
     @Published var pickedPlacemark: CLPlacemark?
+    
+    
+    @Published var stepLocationArr: [CLLocationCoordinate2D]? = []
+    @Published var stepPlacemarkArr: [CLPlacemark]? = []
     
     override init() {
         super.init()
@@ -99,16 +103,18 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
     
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, didChange newState: MKAnnotationView.DragState, fromOldState oldState: MKAnnotationView.DragState) {
         guard let newLocation = view.annotation?.coordinate else{ return }
-        self.pickedLocation = .init(latitude: newLocation.latitude, longitude: newLocation.longitude)
-        updatePlacemark(location: .init(latitude: newLocation.latitude, longitude: newLocation.longitude))
+        updatePlacemark(location: .init(latitude: newLocation.latitude, longitude: newLocation.longitude), coordinates: newLocation)
     }
     
-    func updatePlacemark(location: CLLocation) {
+    func updatePlacemark(location: CLLocation, coordinates: CLLocationCoordinate2D) {
         Task {
             do {
                 guard let place = try await reverseLocationCoordinates(location: location) else { return }
                 await MainActor.run(body: {
                     self.pickedPlacemark = place
+                    self.pickedLocation = coordinates
+                    self.stepPlacemarkArr?.append(place)
+                    self.stepLocationArr?.append(coordinates)
                 })
             }
         }

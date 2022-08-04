@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MessagesViewUser: Identifiable {
+struct FirebaseUser: Identifiable {
     var id: String {uid}
     
     let uid, email, profileImageURL: String

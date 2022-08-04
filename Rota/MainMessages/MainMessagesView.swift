@@ -14,7 +14,7 @@ import FirebaseFirestoreSwift
 
 class MainMessagesViewModel: ObservableObject {
     @Published var errorMessage = ""
-    @Published var messagesViewUser: MessagesViewUser?
+    @Published var messagesViewUser: FirebaseUser?
     @Published var isCurrentlyUserLoggedOut = false
     @Published var recentMessages = [RecentMessage]()
     
@@ -192,7 +192,7 @@ struct MainMessagesView: View {
     }
     
     @State var shouldShowCreateMessageScreen = false
-    @State var messageViewUser: MessagesViewUser?
+    @State var messageViewUser: FirebaseUser?
     
     private var newMessageButton: some View {
         Button(action: {

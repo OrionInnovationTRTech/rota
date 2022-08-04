@@ -16,11 +16,11 @@ class ChatLogViewModel: ObservableObject {
     @Published var errorMessage = ""
     @Published var chatMessages = [ChatMessage]()
     
-    var messagesViewUser: MessagesViewUser?
+    var messagesViewUser: FirebaseUser?
     
-    @Published var currentUser: MessagesViewUser?
+    @Published var currentUser: FirebaseUser?
     
-    init(messagesViewUser: MessagesViewUser?) {
+    init(messagesViewUser: FirebaseUser?) {
         self.messagesViewUser = messagesViewUser
         fetchMessages()
     }

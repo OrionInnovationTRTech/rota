@@ -9,7 +9,7 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 class CreateMessageViewModel: ObservableObject {
-    @Published var users = [MessagesViewUser]()
+    @Published var users = [FirebaseUser]()
     @Published var errorMessage = ""
     
     init() {
@@ -27,7 +27,7 @@ class CreateMessageViewModel: ObservableObject {
                 
                 snapshot?.documents.forEach({ queryDocumentSnapshot in
                     let data = queryDocumentSnapshot.data()
-                    let user = MessagesViewUser(data: data)
+                    let user = FirebaseUser(data: data)
                     if user.uid != FirebaseManager.shared.auth.currentUser?.uid {
                         self.users.append(.init(data: data))
                     }
@@ -40,7 +40,7 @@ class CreateMessageViewModel: ObservableObject {
 
 struct CreateMessageView: View {
     
-    let didSelectUser: (MessagesViewUser) -> ()
+    let didSelectUser: (FirebaseUser) -> ()
     
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject private var createMessageViewModel = CreateMessageViewModel()
