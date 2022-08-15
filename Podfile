@@ -11,4 +11,5 @@ target 'Rota' do
   pod 'FirebaseFirestore'
   pod 'SDWebImageSwiftUI'
   pod 'FirebaseFirestoreSwift'
+  pod 'GeoFire/Utils'
 end

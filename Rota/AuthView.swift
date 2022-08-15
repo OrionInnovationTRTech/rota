@@ -16,6 +16,7 @@ struct AuthView: View {
     
     @State private var isLoginMode = false
     @State private var email = ""
+    @State private var name = ""
     @State private var password = ""
     @State private var shouldShowImagePicker = false
     
@@ -47,6 +48,10 @@ struct AuthView: View {
                                     .stroke(Color.black, lineWidth: 3)
                             )
                         }
+                        TextField("Full Name", text: $name)
+                            .autocapitalization(.words)
+                            .padding(12)
+                            .background(Color.white)
                     }
                     Group{
                         TextField("Email", text: $email)
@@ -173,7 +178,7 @@ struct AuthView: View {
     }
     private func storeUserInformation(imageProfileURL: URL) {
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
-        let userData = ["email": self.email, "uid": uid, "profileImageURL": imageProfileURL.absoluteString]
+        let userData = ["name": self.name, "email": self.email, "uid": uid, "profileImageURL": imageProfileURL.absoluteString]
         FirebaseManager.shared.firestore.collection("users").document(uid).setData(userData) { err in
             if let err = err {
                 print(err)

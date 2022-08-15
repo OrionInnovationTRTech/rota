@@ -647,6 +647,7 @@ PODS:
   - FirebaseStorageInternal (9.2.0):
     - FirebaseCore (~> 9.0)
     - GTMSessionFetcher/Core (< 3.0, >= 1.7)
+  - GeoFire/Utils (4.3.0)
   - GoogleDataTransport (9.1.4):
     - GoogleUtilities/Environment (~> 7.7)
     - nanopb (< 2.30910.0, >= 2.30908.0)
@@ -742,6 +743,7 @@ DEPENDENCIES:
   - FirebaseFirestore
   - FirebaseFirestoreSwift
   - FirebaseStorage
+  - GeoFire/Utils
   - SDWebImageSwiftUI
 
 SPEC REPOS:
@@ -759,6 +761,7 @@ SPEC REPOS:
     - FirebaseFirestoreSwift
     - FirebaseStorage
     - FirebaseStorageInternal
+    - GeoFire
     - GoogleDataTransport
     - GoogleUtilities
     - "gRPC-C++"
@@ -785,6 +788,7 @@ SPEC CHECKSUMS:
   FirebaseFirestoreSwift: 427a66f18feaaa26c69cf0d1d5645d827b888ae5
   FirebaseStorage: b47b4a04062ab07911063571241c103a8a2a2332
   FirebaseStorageInternal: 50c963664bc73739b68eb2d8427c91de5168dbcf
+  GeoFire: c34927b5c81ab614f611c79aa8d074cfa9780f07
   GoogleDataTransport: 5fffe35792f8b96ec8d6775f5eccd83c998d5a3b
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
   "gRPC-C++": 9675f953ace2b3de7c506039d77be1f2e77a8db2
@@ -797,6 +801,6 @@ SPEC CHECKSUMS:
   SDWebImage: 0327043dbb9533e75f2eff8445b3df0f2ceca6ac
   SDWebImageSwiftUI: 8a3923c95108312b03a599ec1498754af55a6819
 
-PODFILE CHECKSUM: 36ac2d6337854b7b4022eb2b4db8ec05327baca8
+PODFILE CHECKSUM: b5b778a3b229550f10c85624caf09af848c72e22
 
 COCOAPODS: 1.11.3

@@ -18,21 +18,17 @@ class CreateRouteViewModel: ObservableObject {
     
     @Published var errorMessage: String = ""
     
-    @Published var pointsFloatArray: String?
+    @Published var shortestPointsDictArray: [String: [String: Any]]?
     @Published var distance: Float?
-    //@Published var directions: [Int: [String]]?
     @Published var tripDate: Date?
     
-//    init(placeArray: [CLPlacemark], pointsArray: [CLLocationCoordinate2D], annotationArr: [MKAnnotation], routeArray: [MKRoute], distance: Float, directions: [Int: [String]], tripDate: Date) {
-//        self.placeArray = placeArray
-//        self.pointsArray = pointsArray
-//        self.annotationArr = annotationArr
-//        self.routeArray = routeArray
-//        self.distance = distance
-//        self.directions = directions
-//        self.tripDate = tripDate
-//        fetchCurrentUser()
-//    }
+    @Published var placeArray: [CLPlacemark]?
+    
+    @Published var tripData: FirebaseTrip?
+    
+    @Published var startingLocationManager: LocationManager?
+    @Published var destinationLocationManager: LocationManager?
+    
     
     init() {
         fetchCurrentUser()
@@ -41,34 +37,40 @@ class CreateRouteViewModel: ObservableObject {
     
     func handleSend() {
         guard let publisher = FirebaseManager.shared.auth.currentUser?.uid else {return}
-        
-        let document = FirebaseManager.shared.firestore.collection("trips")
-            .document()
-        
-        let tripData = [FirebaseConstants.publisher: publisher, "pointsArray": self.pointsFloatArray!, "distance": self.distance!, "tripDate": self.tripDate!, FirebaseConstants.timestamp: Timestamp()] as [String : Any]
-        
-        document.setData(tripData) { error in
-            if let error = error {
-                self.errorMessage = "Failed to save trip into Firestore: \(error)"
+        if placeArray == [] {
+            guard let tripData = tripData else {
                 return
+            }
+            
+            var newDict: [String: [String: Any]] = [:]
+            
+            for key in tripData.shortestPointsDictArray.keys {
+                newDict[key] = ["geohash": tripData.shortestPointsDictArray[key]!.geohash, "lat": tripData.shortestPointsDictArray[key]!.lat, "lon": tripData.shortestPointsDictArray[key]!.lon, "title": tripData.shortestPointsDictArray[key]!.title, "subtitle": tripData.shortestPointsDictArray[key]!.subtitle]
+            }
+            
+            let newData = ["publisher": tripData.publisher, "distance": tripData.distance, "timestamp": tripData.timestamp, "tripDate": tripData.tripDate, "shortestPointsDictArray": newDict] as [String : Any]
+            
+            let document = FirebaseManager.shared.firestore.collection("trips")
+                .document(tripData.id!)
+            
+            document.setData(newData) { error in
+                if let error = error {
+                    self.errorMessage = "Failed to save trip into Firestore: \(error)"
+                    return
+                }
+            }
+        } else {
+            let tripData = [FirebaseConstants.publisher: publisher, "shortestPointsDictArray": self.shortestPointsDictArray!, "distance": self.distance!, "tripDate": self.tripDate!, FirebaseConstants.timestamp: Timestamp()] as [String : Any]
+            let document = FirebaseManager.shared.firestore.collection("trips")
+                .document()
+            document.setData(tripData) { error in
+                if let error = error {
+                    self.errorMessage = "Failed to save trip into Firestore: \(error)"
+                    return
+                }
             }
         }
         print("Successfully saved trip")
-        
-//        let recipientMessageDocument = FirebaseManager.shared.firestore.collection("messages")
-//            .document(toId)
-//            .collection(fromId)
-//            .document()
-//
-//        recipientMessageDocument.setData(messageData) { error in
-//            if let error = error {
-//                self.errorMessage = "Failed to save message into Firestore: \(error)"
-//                return
-//            }
-//            print("Recipient saved message as well")
-//        }
-        
-        fetchCurrentUser()
     }
     
     func fetchCurrentUser() {
@@ -89,8 +91,6 @@ class CreateRouteViewModel: ObservableObject {
             self.createRouteUser = .init(data: data)
         }
     }
-    
- 
 }
 
 struct CreateRouteView: View {
@@ -100,9 +100,14 @@ struct CreateRouteView: View {
     @State var distance: Float = 0
     
     @State var placeArray: [CLPlacemark]
+    @State var placeTitleArray: [String]?
+    @State var placeSubtitleArray: [String]?
+    
+    @State var passengerCount: Int?
+    
     @State var pointsArray: [CLLocationCoordinate2D]
     
-    @State var pointsFloatArray: [String: Double] = [:]
+    @State var shortestPointsDictArray: [String: [String: Any]] = [:]
     
     @State var mapView: MKMapView = .init()
     
@@ -113,14 +118,26 @@ struct CreateRouteView: View {
     @State var shouldShowPublishSheet = false
     @State var getMapView: MKMapView = .init()
     
-    @State var tripDate: Date
+    @State var tripDate = Date()
+    @State var expectedTravelTime: String = ""
+    @State var expectedTime: Double = 0
+    @State var timeArr: [Double] = []
+    
+    @State var polylineArr: [MKPolyline] = []
+    
+    @State var tripID: String?
+    
+    @State var tripData: FirebaseTrip?
+    
+    @State var startingLocationManager: LocationManager?
+    @State var destinationLocationManager: LocationManager?
     
     @ObservedObject var createRouteViewModel: CreateRouteViewModel = .init()
     
     var body: some View {
         NavigationView {
             ZStack {
-                DirectionsMapView(distance: $distance, directions: $directions, pointsArray: $pointsArray, placeArray: $placeArray, mapView: $mapView, routeArray: $routeArray, distanceArray: $distanceArray, annotationArr: $annotationArr, pointsFloatArray: $pointsFloatArray)
+                DirectionsMapView(distance: $distance, directions: $directions, pointsArray: $pointsArray, placeArray: $placeArray, mapView: $mapView, routeArray: $routeArray, distanceArray: $distanceArray, annotationArr: $annotationArr, shortestPointsDictArray: $shortestPointsDictArray, tripDate: $tripDate, expectedTravelTimeString: $expectedTravelTime, expectedTime: $expectedTime, timeArr: $timeArr, placeTitleArray: $placeTitleArray, placeSubtitleArray: $placeSubtitleArray, polylineArr: $polylineArr, passengerCount: $passengerCount, tripData: $tripData)
                     .ignoresSafeArea()
                     .onDisappear {
                         self.mapView.removeOverlays(self.mapView.overlays)
@@ -252,20 +269,20 @@ struct CreateRouteView: View {
                             
                             Button {
                                 //MARK: - firebase
-                                if let theJSONData = try? JSONSerialization.data(
-                                    withJSONObject: self.pointsFloatArray,
-                                    options: []) {
-                                    let theJSONText = String(data: theJSONData,
-                                                               encoding: .ascii)
-                                    print("JSON string = \(theJSONText!)")
+                                createRouteViewModel.placeArray = self.placeArray
+                                createRouteViewModel.shortestPointsDictArray = shortestPointsDictArray
+                                createRouteViewModel.distance = self.distance
+                                //createRouteViewModel.directions = self.directions
+                                createRouteViewModel.tripDate = self.tripDate
+                                
+                                createRouteViewModel.tripData = self.tripData
+                                createRouteViewModel.startingLocationManager = self.startingLocationManager
+                                createRouteViewModel.destinationLocationManager = self.destinationLocationManager
                                     
-                                    createRouteViewModel.pointsFloatArray = theJSONText
-                                    createRouteViewModel.distance = self.distance
-                                    //createRouteViewModel.directions = self.directions
-                                    createRouteViewModel.tripDate = self.tripDate
-                                    
-                                    createRouteViewModel.handleSend()
-                                }
+                                print("pass cnt: \(passengerCount!)")
+                                
+                                createRouteViewModel.handleSend()
+                                self.shouldShowPublishSheet.toggle()
                             } label: {
                                 Text("Publish Route")
                                     .fontWeight(.semibold)
@@ -291,16 +308,29 @@ struct CreateRouteView: View {
             .navigationBarTitle("", displayMode: .inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    if self.distance != 0 {
-                        Text("Distance: \(String(format: "%.2f", self.distance))").fontWeight(.semibold)
-                            .padding(12)
-                            .background {
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .fill(.white)
-                            }
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    VStack {
+                        if self.distance != 0 {
+                            Text("Distance: \(String(format: "%.2f", self.distance)) km").fontWeight(.semibold)
+                                .padding(12)
+                                .background {
+                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                        .fill(.white)
+                                }
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                        }
+                        if self.expectedTravelTime != "" {
+                            Text("Expected Travel Time: \(String(self.expectedTravelTime))").fontWeight(.semibold)
+                                .padding(12)
+                                .background {
+                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                        .fill(.white)
+                                }
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                        }
                     }
+                    
                 }
             }
         }

@@ -11,6 +11,7 @@ import MapKit
 import Combine
 
 class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocationManagerDelegate {
+    
     @Published var mapView: MKMapView = .init()
     @Published var manager: CLLocationManager = .init()
     
@@ -53,7 +54,6 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
                 let request = MKLocalSearch.Request()
                 request.naturalLanguageQuery = value.lowercased()
                 let response = try await MKLocalSearch(request: request).start()
-                
                 await MainActor.run(body: {
                     self.fetchedPlaces = response.mapItems.compactMap({ item -> CLPlacemark? in
                         return item.placemark
@@ -89,12 +89,12 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
     func addDraggablePin(coordinate: CLLocationCoordinate2D) {
         let annotion = MKPointAnnotation()
         annotion.coordinate = coordinate
-        annotion.title = "Food will be delivered here"
+        annotion.subtitle = "Pin is draggable"
         mapView.addAnnotation(annotion)
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        let marker = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "DELIVERYPIN")
+        let marker = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "PIN")
         marker.isDraggable = true
         marker.canShowCallout = false
         
@@ -102,11 +102,12 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
     }
     
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, didChange newState: MKAnnotationView.DragState, fromOldState oldState: MKAnnotationView.DragState) {
-        guard let newLocation = view.annotation?.coordinate else{ return }
-        updatePlacemark(location: .init(latitude: newLocation.latitude, longitude: newLocation.longitude), coordinates: newLocation)
+        guard let newLocation = view.annotation?.coordinate else { return }
+        updatePlacemark(location: .init(latitude: newLocation.latitude, longitude: newLocation.longitude), coordinates: newLocation) {
+        }
     }
     
-    func updatePlacemark(location: CLLocation, coordinates: CLLocationCoordinate2D) {
+    func updatePlacemark(location: CLLocation, coordinates: CLLocationCoordinate2D, complitionHandler: @escaping () -> Void) {
         Task {
             do {
                 guard let place = try await reverseLocationCoordinates(location: location) else { return }
@@ -115,6 +116,7 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
                     self.pickedLocation = coordinates
                     self.stepPlacemarkArr?.append(place)
                     self.stepLocationArr?.append(coordinates)
+                    complitionHandler()
                 })
             }
         }

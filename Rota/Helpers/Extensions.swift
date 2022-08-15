@@ -10,7 +10,6 @@ import MapKit
 
 extension View {
     func popupNavigationView<Content: View>(horizontalPadding: CGFloat = 40, show: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
-        
         return self
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .overlay {
@@ -28,6 +27,54 @@ extension View {
                 }
             }
     }
+    
+    @ViewBuilder
+    func offsetY(completion: @escaping (CGFloat, CGFloat) -> ()) -> some View {
+        self
+            .modifier(OffsetHelper(onChange: completion))
+    }
+    
+    func safeArea()->UIEdgeInsets{
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return .zero }
+        guard let safeArea = scene.windows.first?.safeAreaInsets else { return .zero }
+        return safeArea
+    }
+}
+
+struct OffsetHelper: ViewModifier {
+    var onChange: (CGFloat, CGFloat) -> ()
+    @State var currentOffset: CGFloat = 0
+    @State var previousOffset: CGFloat = 0
+    
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                GeometryReader { proxy in
+                    let minY = proxy.frame(in: .named("SCROLL")).minY
+                    Color.clear
+                        .preference(key: OffsetKey.self, value: minY)
+                        .onPreferenceChange(OffsetKey.self) { value in
+                            previousOffset = currentOffset
+                            currentOffset = value
+                            onChange(previousOffset, currentOffset)
+                        }
+                }
+            }
+    }
+}
+
+struct OffsetKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+struct HeaderBoundsKey: PreferenceKey {
+    static var defaultValue: Anchor<CGRect>?
+    static func reduce(value: inout Anchor<CGRect>?, nextValue: () -> Anchor<CGRect>?) {
+        value = nextValue()
+    }
 }
 
 extension Color {
@@ -39,6 +86,18 @@ extension Color {
         )
     }
 }
+
+extension UIColor {
+    static var random: UIColor {
+        return UIColor(
+            red: .random(in: 0...0.5),
+            green: .random(in: 0...0.5),
+            blue: .random(in: 0...0.5),
+            alpha: 1
+        )
+    }
+}
+
 
 extension CLLocationCoordinate2D : Equatable {
     static public func ==(left: CLLocationCoordinate2D, right: CLLocationCoordinate2D) -> Bool {

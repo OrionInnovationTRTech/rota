@@ -10,19 +10,12 @@ import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
+import CoreLocation
 
-struct FirebaseTrip: Codable, Identifiable {
+struct FirebaseTrip: Decodable, Identifiable {
     @DocumentID var id: String?
-    
-    let publisher, pointsArray: String
+    let publisher: String
+    var shortestPointsDictArray: [String: FirebasePointsDictionary]
     let distance: Float
     let tripDate, timestamp: Date
-    
-    init(data: [String: Any]) {
-        self.publisher = data["publisher"] as? String ?? ""
-        self.pointsArray = data["pointsArray"] as? String ?? ""
-        self.distance = data["distance"] as? Float ?? 0
-        self.tripDate = data["tripDate"] as? Date ?? Date()
-        self.timestamp = data["timestamp"] as? Date ?? Date()
-    }
 }

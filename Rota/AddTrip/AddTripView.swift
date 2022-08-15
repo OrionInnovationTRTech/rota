@@ -86,7 +86,7 @@ struct AddTripView: View {
                                     }
                                     
                                 } else {
-                                    Text("Add Step Point")
+                                    Text("Choose Step Point")
                                         .foregroundColor(.gray)
                                 }
                                 
@@ -94,9 +94,8 @@ struct AddTripView: View {
                                 
                                 Button {
                                     if i < stepLocationManager.stepPlacemarkArr?.count ?? 0 {
-                                        if stepLocationManager.stepPlacemarkArr?[i] != nil {
-                                            stepLocationManager.stepPlacemarkArr?.remove(at: i)
-                                        }
+                                        stepLocationManager.stepPlacemarkArr?.remove(at: i)
+                                        stepLocationManager.stepLocationArr?.remove(at: i)
                                     }
                                     count -= 1
                                 } label: {
@@ -160,7 +159,7 @@ struct AddTripView: View {
                         HStack {
                             Image(systemName: "plus.circle")
                                 .foregroundColor(Color(.label))
-                            Text("Add target")
+                            Text("Add step point")
                                 .foregroundColor(Color(.darkGray))
                         }
                         if self.showAddTargetMessage {
@@ -201,7 +200,6 @@ struct AddTripView: View {
                     if let locationStart = startingLocationManager.pickedLocation, let locationEnd = destinationLocationManager.pickedLocation, let placemarkStart = startingLocationManager.pickedPlacemark, let placemarkEnd = destinationLocationManager.pickedPlacemark, let stepPlaceArray = stepLocationManager.stepPlacemarkArr, let stepLocationArr = stepLocationManager.stepLocationArr {
                         
                         CreateRouteView(placeArray: [placemarkStart] + stepPlaceArray + [placemarkEnd], pointsArray: [locationStart] + stepLocationArr + [locationEnd], tripDate: tripDay)
-                         
                         .navigationBarTitleDisplayMode(.inline)
                     }
                     

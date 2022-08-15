@@ -226,9 +226,6 @@ struct ChatLogView: View {
     
     private var chatBottomBar: some View {
         HStack {
-            Image(systemName: "plus.square")
-                .font(.system(size: 24))
-                .foregroundColor(Color(.label))
             ZStack(alignment: .leading) {
                 Text("Description")
                     .padding(.horizontal, 4)

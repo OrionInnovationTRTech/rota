@@ -40,7 +40,9 @@ struct SearchLocationView: View {
                                 locationManager.pickedLocation = .init(latitude: coordinate.latitude, longitude: coordinate.longitude)
                                 locationManager.mapView.region = .init(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
                                 locationManager.addDraggablePin(coordinate: coordinate)
-                                locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate)
+                                locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate) {
+                                    
+                                }
                             }
                             navigationTag = "MAPVIEW"
                         } label: {
@@ -66,7 +68,9 @@ struct SearchLocationView: View {
                     if let coordinate = locationManager.userLocation?.coordinate{
                         locationManager.mapView.region = .init(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
                         locationManager.addDraggablePin(coordinate: coordinate)
-                        locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate)
+                        locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate) {
+                            
+                        }
                         
                         navigationTag = "MAPVIEW"
                     }
@@ -125,7 +129,9 @@ struct MapViewSelection: View {
                             if let coordinate = locationManager.userLocation?.coordinate{
                                 locationManager.mapView.region = .init(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
                                 locationManager.addDraggablePin(coordinate: coordinate)
-                                locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate)
+                                locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate) {
+                                    
+                                }
                                 
                                 navigationTag = "MAPVIEW"
                             }
