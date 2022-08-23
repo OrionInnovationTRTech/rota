@@ -11,6 +11,7 @@ import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
 import SDWebImageSwiftUI
+import GeoFire
 
 class SearchTripViewModel: ObservableObject {
     @Published var trips: [FirebaseTrip] = []
@@ -19,6 +20,7 @@ class SearchTripViewModel: ObservableObject {
     @Published var pointsCoordinateArr: [CLLocationCoordinate2D] = []
     @Published var pointsTitleArr: [String] = []
     @Published var pointsSubtitleArr: [String] = []
+    @Published var pointsRelatedUsersArr: [String] = []
     
     @Published var tripsPlaceArr: [[CLPlacemark]] = []
     @Published var users: [String: FirebaseUser] = [:]
@@ -27,9 +29,13 @@ class SearchTripViewModel: ObservableObject {
     
     @Published var passengerCount = 0
     
+    @Published var startGeohash: String = ""
+    @Published var destinationGeohash: String = ""
+    
     func fetchTrips(completionHandler: @escaping () -> Void) {
         self.trips = []
-        FirebaseManager.shared.firestore.collection("trips")
+        
+        FirebaseManager.shared.firestore.collection("trips").whereField("geohashesForQuery", arrayContainsAny: [String(destinationGeohash.prefix(3))])
             .getDocuments { snapshot, error in
                 if let error = error {
                     self.errorMessage = "Failed to fetch users: \(error)"
@@ -74,11 +80,12 @@ class SearchTripViewModel: ObservableObject {
                 self.errorMessage = "Fetched users successfully"
             }
     }
-    
-    
 }
 
 struct SearchTripView: View {
+    
+    @State var currentUser: FirebaseUser
+    
     @State var tripDay = Date()
     @State var shouldShowSearchLocationView = false
     @StateObject var startingLocationManager = LocationManager()
@@ -193,6 +200,8 @@ struct SearchTripView: View {
             }
             
             Button {
+                searchTripViewModel.startGeohash = GFUtils.geoHash(forLocation: .init(latitude: startingLocationManager.pickedLocation!.latitude, longitude: startingLocationManager.pickedLocation!.longitude))
+                searchTripViewModel.destinationGeohash = GFUtils.geoHash(forLocation: .init(latitude: destinationLocationManager.pickedLocation!.latitude, longitude: destinationLocationManager.pickedLocation!.longitude))
                 self.tripsPointsTitle = []
                 self.tripsPointsSubtitle = []
                 self.users = []
@@ -274,7 +283,6 @@ struct SearchTripView: View {
                     .offset(y: -headerOffset < headerHeight ? headerOffset: (headerOffset < 0 ? headerOffset : 0))
             }
             .ignoresSafeArea(.all, edges: .top)
-            
             .navigationBarTitle("Back", displayMode: .inline)
             .navigationBarHidden(true)
         }
@@ -288,28 +296,33 @@ struct SearchTripView: View {
                     var coordinates: [CLLocationCoordinate2D] = []
                     var titles: [String] = []
                     var subtitles: [String] = []
+                    var uids: [String] = []
                     
                     coordinates.append(CLLocationCoordinate2D(latitude: searchTripViewModel.trips[i].shortestPointsDictArray["start"]!.lat, longitude: searchTripViewModel.trips[i].shortestPointsDictArray["start"]!.lon))
                     titles.append(searchTripViewModel.trips[i].shortestPointsDictArray["start"]!.title)
                     subtitles.append(searchTripViewModel.trips[i].shortestPointsDictArray["start"]!.subtitle)
+                    uids.append(searchTripViewModel.trips[i].shortestPointsDictArray["start"]!.relatedUser!)
                     
                     coordinates.append(self.startingLocationManager.pickedLocation!)
-                    titles.append("\(self.startingLocationManager.pickedPlacemark?.locality ?? "")/\(self.startingLocationManager.pickedPlacemark?.administrativeArea ?? "")")
-                    subtitles.append(self.startingLocationManager.pickedPlacemark?.locality ?? "")
+                    titles.append(self.startingLocationManager.pickedPlacemark?.name ?? "")
+                    subtitles.append("\(self.startingLocationManager.pickedPlacemark?.locality ?? "")/\(self.startingLocationManager.pickedPlacemark?.administrativeArea ?? "")")
+                    uids.append(self.currentUser.uid)
                     
                     coordinates.append(self.destinationLocationManager.pickedLocation!)
-                    titles.append("\(self.destinationLocationManager.pickedPlacemark?.locality ?? "")/\(self.destinationLocationManager.pickedPlacemark?.administrativeArea ?? "")")
-                    subtitles.append(self.destinationLocationManager.pickedPlacemark?.locality ?? "")
+                    titles.append(self.destinationLocationManager.pickedPlacemark?.name ?? "")
+                    subtitles.append("\(self.destinationLocationManager.pickedPlacemark?.locality ?? "")/\(self.destinationLocationManager.pickedPlacemark?.administrativeArea ?? "")")
+                    uids.append(self.currentUser.uid)
                     
-                    searchTripViewModel.passengerCount = searchTripViewModel.trips[i].shortestPointsDictArray.keys.filter{$0.contains("passenger")}.count-1
+                    searchTripViewModel.passengerCount = searchTripViewModel.trips[i].shortestPointsDictArray.keys.filter{$0.contains("passenger")}.count
                     
                     print("psg count : \(searchTripViewModel.passengerCount)")
                     print("coo count : \(coordinates.count)")
                     if searchTripViewModel.passengerCount != 0 {
-                        for _ in 0...searchTripViewModel.passengerCount {
+                        for _ in 0..<searchTripViewModel.passengerCount {
                             coordinates.append(self.destinationLocationManager.pickedLocation!)
-                            titles.append("\(self.destinationLocationManager.pickedPlacemark?.locality ?? "")/\(self.destinationLocationManager.pickedPlacemark?.administrativeArea ?? "")")
-                            subtitles.append(self.destinationLocationManager.pickedPlacemark?.locality ?? "")
+                            titles.append(self.destinationLocationManager.pickedPlacemark?.name ?? "")
+                            subtitles.append("\(self.destinationLocationManager.pickedPlacemark?.locality ?? "")/\(self.destinationLocationManager.pickedPlacemark?.administrativeArea ?? "")")
+                            uids.append(self.currentUser.uid)
                         }
                     }
                     
@@ -325,6 +338,7 @@ struct SearchTripView: View {
                             coordinates[index] = (CLLocationCoordinate2D(latitude: searchTripViewModel.trips[i].shortestPointsDictArray[key]!.lat, longitude: searchTripViewModel.trips[i].shortestPointsDictArray[key]!.lon))
                             titles[index] = (searchTripViewModel.trips[i].shortestPointsDictArray[key]!.title)
                             subtitles[index] = (searchTripViewModel.trips[i].shortestPointsDictArray[key]!.subtitle)
+                            uids[index] = (searchTripViewModel.trips[i].shortestPointsDictArray[key]!.relatedUser!)
                         }
                     }
                     
@@ -336,18 +350,35 @@ struct SearchTripView: View {
                             coordinates.append(CLLocationCoordinate2D(latitude: searchTripViewModel.trips[i].shortestPointsDictArray[key]!.lat, longitude: searchTripViewModel.trips[i].shortestPointsDictArray[key]!.lon))
                             titles.append(searchTripViewModel.trips[i].shortestPointsDictArray[key]!.title)
                             subtitles.append(searchTripViewModel.trips[i].shortestPointsDictArray[key]!.subtitle)
+                            uids.append(searchTripViewModel.trips[i].shortestPointsDictArray[key]!.relatedUser!)
                         }
                     }
                     
                     coordinates.append(CLLocationCoordinate2D(latitude: searchTripViewModel.trips[i].shortestPointsDictArray["destination"]!.lat, longitude: searchTripViewModel.trips[i].shortestPointsDictArray["destination"]!.lon))
                     titles.append(searchTripViewModel.trips[i].shortestPointsDictArray["destination"]!.title)
                     subtitles.append(searchTripViewModel.trips[i].shortestPointsDictArray["destination"]!.subtitle)
+                    uids.append(searchTripViewModel.trips[i].shortestPointsDictArray["destination"]!.relatedUser!)
                     
                     searchTripViewModel.pointsCoordinateArr = coordinates
                     searchTripViewModel.pointsTitleArr = titles
                     searchTripViewModel.pointsSubtitleArr = subtitles
+                    searchTripViewModel.pointsRelatedUsersArr = uids
+                    
+                    
+                    print("placetitlearray: \(titles)")
+                    print("placesubtitlearray: \(subtitles)")
+                    print("passengercnt: \(searchTripViewModel.passengerCount)")
+                    print("tripdata: \(self.tripsData[i])")
                 }, destination: {
-                    CreateRouteView(placeArray: [], placeTitleArray: searchTripViewModel.pointsTitleArr, placeSubtitleArray: searchTripViewModel.pointsSubtitleArr, passengerCount: searchTripViewModel.passengerCount, pointsArray: searchTripViewModel.pointsCoordinateArr, tripData: self.tripsData[i], startingLocationManager: self.startingLocationManager, destinationLocationManager: self.destinationLocationManager)
+                    TripDetailsView(placeArray: [], placeTitleArray: searchTripViewModel.pointsTitleArr, placeSubtitleArray: searchTripViewModel.pointsSubtitleArr, placeRelatedUserArray: searchTripViewModel.pointsRelatedUsersArr, passengerCount: searchTripViewModel.passengerCount, pointsArray: searchTripViewModel.pointsCoordinateArr, tripData: self.tripsData[i], didSaveTrip: {
+                        self.startingLocationManager.pickedLocation = nil
+                        self.startingLocationManager.pickedPlacemark = nil
+                        
+                        self.destinationLocationManager.pickedLocation = nil
+                        self.destinationLocationManager.pickedPlacemark = nil
+                        
+                        shouldShowTrips.toggle()
+                    })
                 }, label: {
                     HStack {
                         VStack(alignment: .leading) {
@@ -435,7 +466,7 @@ struct SearchTripView: View {
 
 struct SearchTripView_Previews: PreviewProvider {
     static var previews: some View {
-        SearchTripView()
+        SearchTripView(currentUser: .init(data: [:]))
     }
 }
 

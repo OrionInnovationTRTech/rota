@@ -13,4 +13,5 @@ struct FirebasePointsDictionary: Decodable {
     let lon: Double
     let title: String
     let subtitle: String
+    let relatedUser: String?
 }

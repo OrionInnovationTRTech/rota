@@ -8,7 +8,7 @@
 import SwiftUI
 class AppTabViewModel: ObservableObject {
     @Published var errorMessage = ""
-    @Published var messagesViewUser: FirebaseUser?
+    @Published var currentUser: FirebaseUser?
     @Published var isCurrentlyUserLoggedOut = false
     init() {
         DispatchQueue.main.async {
@@ -31,7 +31,7 @@ class AppTabViewModel: ObservableObject {
                 return
             }
             
-            self.messagesViewUser = .init(data: data)
+            self.currentUser = .init(data: data)
         }
     }
 }
@@ -39,32 +39,43 @@ struct AppTabView: View {
     @ObservedObject private var appTabViewModel = AppTabViewModel()
     var body: some View {
         TabView {
-            SearchTripView()
-                .tabItem {
-                    Label("Search", systemImage: "magnifyingglass")
+            Group {
+                if appTabViewModel.currentUser != nil {
+                    SearchTripView(currentUser: appTabViewModel.currentUser!)
+                        .tabItem {
+                            Label("Search", systemImage: "magnifyingglass")
+                        }
+                } else {
+                    ProgressView()
+                        .tabItem {
+                            Label("Search", systemImage: "magnifyingglass")
+                        }
                 }
-                .padding(.top, 8)
-                .padding(.bottom, 1)
-                .navigationBarTitle("Back")
-                .navigationBarHidden(true)
-            
-            AddTripView()
-                .tabItem {
-                    Label("Add", systemImage: "plus")
-                }
-                .padding(.top, 8)
-                .padding(.bottom, 1)
-                .navigationBarTitle("Back")
-                .navigationBarHidden(true)
-            
-            MainMessagesView()
-                .tabItem {
-                    Label("Messages", systemImage: "message")
-                }
-                .padding(.top, 8)
-                .padding(.bottom, 1)
-                .navigationBarTitle("Back")
-                .navigationBarHidden(true)
+                
+                AddTripView()
+                    .tabItem {
+                        Label("Add", systemImage: "plus")
+                    }
+                
+                UserTripsView(userTripsViewModel: UserTripsViewModel(currentUser: appTabViewModel.currentUser))
+                    .tabItem {
+                        Label("Your Trips", systemImage: "car.2")
+                    }
+                
+                MainMessagesView()
+                    .tabItem {
+                        Label("Messages", systemImage: "message")
+                    }
+                
+                ProfileView()
+                    .tabItem {
+                        Label("Profile", systemImage: "person")
+                    }
+            }
+            .padding(.top, 8)
+            .padding(.bottom, 1)
+            .navigationBarTitle("Back")
+            .navigationBarHidden(true)
         }
         .fullScreenCover(isPresented: $appTabViewModel.isCurrentlyUserLoggedOut) {
             AuthView(didCompleteLoginProcess: {

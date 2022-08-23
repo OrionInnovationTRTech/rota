@@ -17,5 +17,6 @@ struct FirebaseTrip: Decodable, Identifiable {
     let publisher: String
     var shortestPointsDictArray: [String: FirebasePointsDictionary]
     let distance: Float
+    let geohashesForQuery: [String]
     let tripDate, timestamp: Date
 }

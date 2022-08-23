@@ -29,47 +29,28 @@ class CreateRouteViewModel: ObservableObject {
     @Published var startingLocationManager: LocationManager?
     @Published var destinationLocationManager: LocationManager?
     
+    @Published var pointsForGeoQuery: [String]?
     
     init() {
         fetchCurrentUser()
     }
     
     
-    func handleSend() {
+    func handleSend(completion: @escaping (_ isSaveSuccessfully: Bool) -> Void) {
         guard let publisher = FirebaseManager.shared.auth.currentUser?.uid else {return}
-        if placeArray == [] {
-            guard let tripData = tripData else {
+        for key in shortestPointsDictArray!.keys {
+            self.shortestPointsDictArray![key]!["relatedUser"] = publisher
+        }
+        let tripData = [FirebaseConstants.publisher: publisher, "shortestPointsDictArray": self.shortestPointsDictArray!, "distance": self.distance!, "tripDate": self.tripDate!, "geohashesForQuery": self.pointsForGeoQuery!, FirebaseConstants.timestamp: Timestamp()] as [String : Any]
+        let document = FirebaseManager.shared.firestore.collection("trips")
+            .document()
+        document.setData(tripData) { error in
+            if let error = error {
+                self.errorMessage = "Failed to save trip into Firestore: \(error)"
                 return
             }
-            
-            var newDict: [String: [String: Any]] = [:]
-            
-            for key in tripData.shortestPointsDictArray.keys {
-                newDict[key] = ["geohash": tripData.shortestPointsDictArray[key]!.geohash, "lat": tripData.shortestPointsDictArray[key]!.lat, "lon": tripData.shortestPointsDictArray[key]!.lon, "title": tripData.shortestPointsDictArray[key]!.title, "subtitle": tripData.shortestPointsDictArray[key]!.subtitle]
-            }
-            
-            let newData = ["publisher": tripData.publisher, "distance": tripData.distance, "timestamp": tripData.timestamp, "tripDate": tripData.tripDate, "shortestPointsDictArray": newDict] as [String : Any]
-            
-            let document = FirebaseManager.shared.firestore.collection("trips")
-                .document(tripData.id!)
-            
-            document.setData(newData) { error in
-                if let error = error {
-                    self.errorMessage = "Failed to save trip into Firestore: \(error)"
-                    return
-                }
-            }
-        } else {
-            let tripData = [FirebaseConstants.publisher: publisher, "shortestPointsDictArray": self.shortestPointsDictArray!, "distance": self.distance!, "tripDate": self.tripDate!, FirebaseConstants.timestamp: Timestamp()] as [String : Any]
-            let document = FirebaseManager.shared.firestore.collection("trips")
-                .document()
-            document.setData(tripData) { error in
-                if let error = error {
-                    self.errorMessage = "Failed to save trip into Firestore: \(error)"
-                    return
-                }
-            }
         }
+        completion(true)
         print("Successfully saved trip")
     }
     
@@ -95,6 +76,7 @@ class CreateRouteViewModel: ObservableObject {
 
 struct CreateRouteView: View {
     @Environment(\.presentationMode) var presentationMode
+    
     @State var directions: [Int: [String]] = [:]
     @State private var showDirections = false
     @State var distance: Float = 0
@@ -102,6 +84,7 @@ struct CreateRouteView: View {
     @State var placeArray: [CLPlacemark]
     @State var placeTitleArray: [String]?
     @State var placeSubtitleArray: [String]?
+    @State var placeRelatedUsersArr: [String]? = nil
     
     @State var passengerCount: Int?
     
@@ -125,6 +108,8 @@ struct CreateRouteView: View {
     
     @State var polylineArr: [MKPolyline] = []
     
+    @State var searchRouteZoom: [MKAnnotation] = []
+    
     @State var tripID: String?
     
     @State var tripData: FirebaseTrip?
@@ -132,12 +117,23 @@ struct CreateRouteView: View {
     @State var startingLocationManager: LocationManager?
     @State var destinationLocationManager: LocationManager?
     
+    
+    @State var firebasePointsDictionaryArray: [FirebasePointsDictionary] = []
+    
+    @State var tripUsers: [String: FirebaseUser] = [:]
+    
+    @State var tripUids: [String] = []
+    
+    @State var pointsForGeoQuery: [String] = []
+    
+    let didSaveTrip: () -> ()
+    
     @ObservedObject var createRouteViewModel: CreateRouteViewModel = .init()
     
     var body: some View {
         NavigationView {
             ZStack {
-                DirectionsMapView(distance: $distance, directions: $directions, pointsArray: $pointsArray, placeArray: $placeArray, mapView: $mapView, routeArray: $routeArray, distanceArray: $distanceArray, annotationArr: $annotationArr, shortestPointsDictArray: $shortestPointsDictArray, tripDate: $tripDate, expectedTravelTimeString: $expectedTravelTime, expectedTime: $expectedTime, timeArr: $timeArr, placeTitleArray: $placeTitleArray, placeSubtitleArray: $placeSubtitleArray, polylineArr: $polylineArr, passengerCount: $passengerCount, tripData: $tripData)
+                DirectionsMapView(distance: $distance, directions: $directions, pointsArray: $pointsArray, placeArray: $placeArray, mapView: $mapView, routeArray: $routeArray, distanceArray: $distanceArray, annotationArr: $annotationArr, shortestPointsDictArray: $shortestPointsDictArray, tripDate: $tripDate, expectedTravelTimeString: $expectedTravelTime, expectedTime: $expectedTime, timeArr: $timeArr, placeTitleArray: $placeTitleArray, placeSubtitleArray: $placeSubtitleArray, placeRelatedUsersArray: $placeRelatedUsersArr, polylineArr: $polylineArr, searchRouteZoom: $searchRouteZoom, passengerCount: $passengerCount, tripData: $tripData, firebasePointsDictionaryArray: $firebasePointsDictionaryArray, tripUsers: $tripUsers ,tripUids: $tripUids, pointsForGeoQuery: $pointsForGeoQuery)
                     .ignoresSafeArea()
                     .onDisappear {
                         self.mapView.removeOverlays(self.mapView.overlays)
@@ -278,10 +274,14 @@ struct CreateRouteView: View {
                                 createRouteViewModel.tripData = self.tripData
                                 createRouteViewModel.startingLocationManager = self.startingLocationManager
                                 createRouteViewModel.destinationLocationManager = self.destinationLocationManager
-                                    
-                                print("pass cnt: \(passengerCount!)")
                                 
-                                createRouteViewModel.handleSend()
+                                createRouteViewModel.pointsForGeoQuery = self.pointsForGeoQuery
+                                
+                                createRouteViewModel.handleSend { isSaveSuccessfully in
+                                    if isSaveSuccessfully {
+                                        self.didSaveTrip()
+                                    }
+                                }
                                 self.shouldShowPublishSheet.toggle()
                             } label: {
                                 Text("Publish Route")

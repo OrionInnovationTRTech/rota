@@ -11,6 +11,7 @@ import MapKit
 struct SearchLocationView: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject var locationManager: LocationManager
+    @State var index: Int?
     @State var navigationTag: String?
     var body: some View {
         VStack {
@@ -32,14 +33,15 @@ struct SearchLocationView: View {
             }
             .padding(.vertical, 10)
             
-            if let places = locationManager.fetchedPlaces, !places.isEmpty {
+            if let places = locationManager.fetchedPlaces, let placesAdress = locationManager.fetchedPlacesAdress?.filter{locationManager.fetchedPlaces?.map{$0.name}.contains($0.name) != true}, !places.isEmpty {
                 List {
-                    ForEach(places, id: \.self) { place in
+                    ForEach(placesAdress, id: \.self) { place in
                         Button {
                             if let coordinate = place.location?.coordinate{
                                 locationManager.pickedLocation = .init(latitude: coordinate.latitude, longitude: coordinate.longitude)
                                 locationManager.mapView.region = .init(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
                                 locationManager.addDraggablePin(coordinate: coordinate)
+                                locationManager.index = index
                                 locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate) {
                                     
                                 }
@@ -54,20 +56,63 @@ struct SearchLocationView: View {
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text(place.name ?? "")
                                         .font(.title3.bold())
-                                    Text(place.locality ?? "")
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
+                                    HStack(alignment: .center, spacing: 0) {
+                                        Text("\(place.subLocality ?? "")\(place.subLocality != nil ? ", " : "")")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                        
+                                        Text(place.locality ?? "")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    ForEach(places, id: \.self) { place in
+                        Button {
+                            if let coordinate = place.location?.coordinate{
+                                locationManager.pickedLocation = .init(latitude: coordinate.latitude, longitude: coordinate.longitude)
+                                locationManager.mapView.region = .init(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
+                                locationManager.addDraggablePin(coordinate: coordinate)
+                                locationManager.index = index
+                                locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate) {
+                                    
+                                }
+                            }
+                            navigationTag = "MAPVIEW"
+                        } label: {
+                            HStack(spacing: 15) {
+                                Image(systemName: "mappin.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.gray)
+                                
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(place.name ?? "")
+                                        .font(.title3.bold())
+                                    HStack(alignment: .center, spacing: 0) {
+                                        Text("\(place.subLocality ?? "")\(place.subLocality != nil ? ", " : "")")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                        
+                                        Text(place.locality ?? "")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
                                 }
                             }
                         }
 
                     }
-                }
+                }.listStyle(PlainListStyle())
+                
             } else {
                 Button {
                     if let coordinate = locationManager.userLocation?.coordinate{
                         locationManager.mapView.region = .init(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
                         locationManager.addDraggablePin(coordinate: coordinate)
+                        locationManager.index = index
                         locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate) {
                             
                         }
@@ -91,7 +136,7 @@ struct SearchLocationView: View {
         .frame(maxHeight: .infinity, alignment: .top)
         .background {
             NavigationLink(tag: "MAPVIEW", selection: $navigationTag) {
-                MapViewSelection(superPresentationMode: presentationMode)
+                MapViewSelection(superPresentationMode: presentationMode, index: index)
                     .environmentObject(locationManager)
                     .navigationBarHidden(true)
             } label: {}
@@ -112,6 +157,7 @@ struct MapViewSelection: View {
     @Binding var superPresentationMode: PresentationMode
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var locationManager: LocationManager
+    @State var index: Int?
     @State var navigationTag: String?
     var body: some View {
         ZStack{
@@ -129,6 +175,7 @@ struct MapViewSelection: View {
                             if let coordinate = locationManager.userLocation?.coordinate{
                                 locationManager.mapView.region = .init(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
                                 locationManager.addDraggablePin(coordinate: coordinate)
+                                locationManager.index = index
                                 locationManager.updatePlacemark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), coordinates: coordinate) {
                                     
                                 }

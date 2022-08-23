@@ -39,6 +39,21 @@ extension View {
         guard let safeArea = scene.windows.first?.safeAreaInsets else { return .zero }
         return safeArea
     }
+    
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape( RoundedCorner(radius: radius, corners: corners) )
+    }
+}
+
+struct RoundedCorner: Shape {
+
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+        return Path(path.cgPath)
+    }
 }
 
 struct OffsetHelper: ViewModifier {
@@ -117,7 +132,7 @@ extension MKMapView {
         }
         setVisibleMapRect(zoomRect, edgePadding: UIEdgeInsets(top: 100, left: 100, bottom: 100, right: 100), animated: true)
     }
-
+    
     /// We call this function and give it the annotations we want added to the map. we display the annotations if necessary
     func fitAll(in annotations: [MKAnnotation], andShow show: Bool) {
         var zoomRect:MKMapRect  = MKMapRect.null

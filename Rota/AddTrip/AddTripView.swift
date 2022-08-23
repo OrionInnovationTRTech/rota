@@ -19,6 +19,8 @@ struct AddTripView: View {
     @State var count = 0
     
     @State var showAddTargetMessage = false
+    @State var showCreateRouteMessage = false
+
     
     var body: some View {
         ScrollView {
@@ -64,7 +66,7 @@ struct AddTripView: View {
                     ForEach(0..<self.count, id: \.self) { i in
                         NavigationLink {
                             NavigationView {
-                                SearchLocationView(locationManager: stepLocationManager)
+                                SearchLocationView(locationManager: stepLocationManager, index: i)
                                     .navigationBarTitle("", displayMode: .inline)
                                     .navigationBarHidden(true)
                             }
@@ -199,7 +201,21 @@ struct AddTripView: View {
                 NavigationLink {
                     if let locationStart = startingLocationManager.pickedLocation, let locationEnd = destinationLocationManager.pickedLocation, let placemarkStart = startingLocationManager.pickedPlacemark, let placemarkEnd = destinationLocationManager.pickedPlacemark, let stepPlaceArray = stepLocationManager.stepPlacemarkArr, let stepLocationArr = stepLocationManager.stepLocationArr {
                         
-                        CreateRouteView(placeArray: [placemarkStart] + stepPlaceArray + [placemarkEnd], pointsArray: [locationStart] + stepLocationArr + [locationEnd], tripDate: tripDay)
+                        CreateRouteView(placeArray: [placemarkStart] + stepPlaceArray + [placemarkEnd], pointsArray: [locationStart] + stepLocationArr + [locationEnd], tripDate: tripDay, didSaveTrip: {
+                            self.startingLocationManager.pickedLocation = nil
+                            self.startingLocationManager.pickedPlacemark = nil
+                            
+                            self.destinationLocationManager.pickedLocation = nil
+                            self.destinationLocationManager.pickedPlacemark = nil
+                            
+                            self.stepLocationManager.pickedLocation = nil
+                            self.stepLocationManager.pickedPlacemark = nil
+                            
+                            self.stepLocationManager.stepLocationArr = nil
+                            self.stepLocationManager.stepPlacemarkArr = nil
+                            
+                            self.count = 0
+                        })
                         .navigationBarTitleDisplayMode(.inline)
                     }
                     
@@ -214,6 +230,7 @@ struct AddTripView: View {
                                     .fill(.blue)
                             }
                             .foregroundColor(.white)
+                        
                     } else {
                         VStack(spacing: 0) {
                             Text("Create Route")

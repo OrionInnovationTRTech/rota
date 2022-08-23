@@ -16,11 +16,17 @@
 		244CAD93288184A7009B10E0 /* MainMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244CAD92288184A7009B10E0 /* MainMessagesView.swift */; };
 		244CAD962881A19C009B10E0 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244CAD952881A19C009B10E0 /* FirebaseManager.swift */; };
 		2455CA2D289FFE240029EDEF /* FirebasePointsDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2455CA2C289FFE240029EDEF /* FirebasePointsDictionary.swift */; };
+		245C258228AAAA010064D921 /* UserTripsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245C258128AAAA010064D921 /* UserTripsView.swift */; };
+		245C258628AABAF60064D921 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245C258528AABAF60064D921 /* ProfileView.swift */; };
+		245C258828AAD0E10064D921 /* TripDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245C258728AAD0E10064D921 /* TripDetailsView.swift */; };
 		2464BA352892AE7E00F52F5C /* AddTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464BA342892AE7E00F52F5C /* AddTripView.swift */; };
 		24862823288B22800024A7C3 /* RecentMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24862822288B22800024A7C3 /* RecentMessage.swift */; };
 		24862825288B22DA0024A7C3 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24862824288B22DA0024A7C3 /* ChatMessage.swift */; };
 		24862827288B3AA60024A7C3 /* FirebaseConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24862826288B3AA60024A7C3 /* FirebaseConstants.swift */; };
+		24874B2928AE1248009A6F3E /* YourTripsID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24874B2828AE1248009A6F3E /* YourTripsID.swift */; };
 		2488DA442881F30900719F44 /* FirebaseUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2488DA432881F30900719F44 /* FirebaseUser.swift */; };
+		248F301728ABE56D000C77C8 /* FirebasePointsWithFirebaseUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248F301628ABE56D000C77C8 /* FirebasePointsWithFirebaseUser.swift */; };
+		248F301928ABFBD4000C77C8 /* EmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248F301828ABFBD4000C77C8 /* EmptyView.swift */; };
 		2490BA53287EA72900864A7F /* RotaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2490BA52287EA72900864A7F /* RotaApp.swift */; };
 		2490BA57287EA72A00864A7F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2490BA56287EA72A00864A7F /* Assets.xcassets */; };
 		2490BA5A287EA72A00864A7F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2490BA59287EA72A00864A7F /* Preview Assets.xcassets */; };
@@ -47,11 +53,17 @@
 		244CAD92288184A7009B10E0 /* MainMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMessagesView.swift; sourceTree = "<group>"; };
 		244CAD952881A19C009B10E0 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
 		2455CA2C289FFE240029EDEF /* FirebasePointsDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebasePointsDictionary.swift; sourceTree = "<group>"; };
+		245C258128AAAA010064D921 /* UserTripsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTripsView.swift; sourceTree = "<group>"; };
+		245C258528AABAF60064D921 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		245C258728AAD0E10064D921 /* TripDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailsView.swift; sourceTree = "<group>"; };
 		2464BA342892AE7E00F52F5C /* AddTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTripView.swift; sourceTree = "<group>"; };
 		24862822288B22800024A7C3 /* RecentMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentMessage.swift; sourceTree = "<group>"; };
 		24862824288B22DA0024A7C3 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
 		24862826288B3AA60024A7C3 /* FirebaseConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseConstants.swift; sourceTree = "<group>"; };
+		24874B2828AE1248009A6F3E /* YourTripsID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YourTripsID.swift; sourceTree = "<group>"; };
 		2488DA432881F30900719F44 /* FirebaseUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseUser.swift; sourceTree = "<group>"; };
+		248F301628ABE56D000C77C8 /* FirebasePointsWithFirebaseUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebasePointsWithFirebaseUser.swift; sourceTree = "<group>"; };
+		248F301828ABFBD4000C77C8 /* EmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyView.swift; sourceTree = "<group>"; };
 		2490BA4F287EA72900864A7F /* Rota.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rota.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2490BA52287EA72900864A7F /* RotaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotaApp.swift; sourceTree = "<group>"; };
 		2490BA56287EA72A00864A7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -124,6 +136,22 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
+		245C258328AABAAB0064D921 /* UserTrips */ = {
+			isa = PBXGroup;
+			children = (
+				245C258128AAAA010064D921 /* UserTripsView.swift */,
+			);
+			path = UserTrips;
+			sourceTree = "<group>";
+		};
+		245C258428AABAC70064D921 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				245C258528AABAF60064D921 /* ProfileView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
 		2464BA332892AD7900F52F5C /* AddTrip */ = {
 			isa = PBXGroup;
 			children = (
@@ -140,6 +168,8 @@
 				24862822288B22800024A7C3 /* RecentMessage.swift */,
 				2497FDD3289B946200B3087A /* FirebaseTrip.swift */,
 				2455CA2C289FFE240029EDEF /* FirebasePointsDictionary.swift */,
+				248F301628ABE56D000C77C8 /* FirebasePointsWithFirebaseUser.swift */,
+				24874B2828AE1248009A6F3E /* YourTripsID.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -172,8 +202,10 @@
 				24F195972893B7C7008D1C85 /* MapViews */,
 				2464BA332892AD7900F52F5C /* AddTrip */,
 				24B2413228918ED00046D1A5 /* SearchTrip */,
-				24B2413328918F180046D1A5 /* ViewModel */,
+				245C258328AABAAB0064D921 /* UserTrips */,
+				245C258428AABAC70064D921 /* Profile */,
 				2490BA60287EA73C00864A7F /* AuthView.swift */,
+				248F301828ABFBD4000C77C8 /* EmptyView.swift */,
 				2498EC00288ECCC200D4F24F /* AppTabView.swift */,
 				2490BA52287EA72900864A7F /* RotaApp.swift */,
 				24E4A6BE287EDC1600EA81F7 /* GoogleService-Info.plist */,
@@ -197,15 +229,9 @@
 			isa = PBXGroup;
 			children = (
 				2498EC02288ED2B800D4F24F /* SearchTripView.swift */,
+				245C258728AAD0E10064D921 /* TripDetailsView.swift */,
 			);
 			path = SearchTrip;
-			sourceTree = "<group>";
-		};
-		24B2413328918F180046D1A5 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		24F195972893B7C7008D1C85 /* MapViews */ = {
@@ -358,10 +384,14 @@
 				2490BA61287EA73C00864A7F /* AuthView.swift in Sources */,
 				24862823288B22800024A7C3 /* RecentMessage.swift in Sources */,
 				24B2413728918F990046D1A5 /* LocationManager.swift in Sources */,
+				245C258828AAD0E10064D921 /* TripDetailsView.swift in Sources */,
 				2464BA352892AE7E00F52F5C /* AddTripView.swift in Sources */,
+				245C258628AABAF60064D921 /* ProfileView.swift in Sources */,
 				240213012899972700456303 /* Extensions.swift in Sources */,
 				2498EC03288ED2B800D4F24F /* SearchTripView.swift in Sources */,
 				2434DC832887DEB60073E114 /* ChatLogView.swift in Sources */,
+				24874B2928AE1248009A6F3E /* YourTripsID.swift in Sources */,
+				248F301928ABFBD4000C77C8 /* EmptyView.swift in Sources */,
 				2431C555287EF08800D5AE3F /* ImagePicker.swift in Sources */,
 				24163C09289A4BD800EA1D21 /* ShowMapView.swift in Sources */,
 				24862825288B22DA0024A7C3 /* ChatMessage.swift in Sources */,
@@ -370,7 +400,9 @@
 				2490BA63287EAFD500864A7F /* ColorExt.swift in Sources */,
 				24862827288B3AA60024A7C3 /* FirebaseConstants.swift in Sources */,
 				24163C07289A4A0E00EA1D21 /* DirectionsMapView.swift in Sources */,
+				245C258228AAAA010064D921 /* UserTripsView.swift in Sources */,
 				2490BA53287EA72900864A7F /* RotaApp.swift in Sources */,
+				248F301728ABE56D000C77C8 /* FirebasePointsWithFirebaseUser.swift in Sources */,
 				241304622886A92500D126BE /* CreateMessageView.swift in Sources */,
 				2455CA2D289FFE240029EDEF /* FirebasePointsDictionary.swift in Sources */,
 				2498EC01288ECCC200D4F24F /* AppTabView.swift in Sources */,
